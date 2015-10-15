@@ -26,7 +26,7 @@ class DataPacket{ //Note: need to be abstract in future
 		$logger->info("Source address: ". $this->address);
 		$logger->info("Source port:	". $this->port);
 		$logger->info("Packet length:  ". strlen($this->data) - 1);
-		$logger->info("Packet header:  ". ord($this->pid()))
+		$logger->info("Packet header:  ". ord($this->pid()));
 		$logger->info("");
 		$logger->info("Printing hexdump");
 		$logger->info(str_repeat("=", 73));

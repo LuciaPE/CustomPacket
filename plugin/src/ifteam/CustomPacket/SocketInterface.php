@@ -65,19 +65,19 @@ class SocketInterface{
 	 */
 	 
 	public function pushMainQueue(DataPacket $packet){
-		$this->exteranlThreaded[] = $packet;
+		$this->exteranlThreaded[] = json_encode($buffer);
 	}
 	
 	public function readMainQueue(){
-		return $this->externalThreaded->shift();
+		return json_decode($this->externalThreaded->shift());
 	}
 	
 	public function pushInternalQueue(array $buffer){
-		$this->internalThreaded[] = $buffer;
+		$this->internalThreaded[] = json_encode($buffer);
 	}
 	
 	public function readInternalQueue(){
-		return $this->internalThreaded->shift();
+		return json_decode($this->internalThreaded->shift());
 	}
 	
 }

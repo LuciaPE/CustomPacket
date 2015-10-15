@@ -128,19 +128,19 @@ class CustomSocket extends \Thread{
 	}
 	
 	public function pushMainQueue(DataPacket $packet){
-		$this->externalQueue[] = $packet;
+		$this->externalQueue[] = json_encode($packet);
 	}
 	
 	public function readMainQueue(){
-		return $this->externalQueue->shift();
+		return json_decode($this->externalQueue->shift());
 	}
 	
 	public function pushInternalQueue(array $buffer){
-		$this->internalQueue[] = $buffer;
+		$this->internalQueue[] = json_encode($buffer);
 	}
 	
 	public function readInternalQueue(){
-		return $this->internalQueue->shift();
+		return json_decode($this->internalQueue->shift());
 	}
 	
 }
