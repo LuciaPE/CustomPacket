@@ -26,7 +26,7 @@ class SocketInterface{
 	
 	public function process(){
 		$work = false;
-		$this->pushInternalQueue([chr(Info::SIGNAL_TICK)]);
+		$this->pushInternalQueue([Info::SIGNAL_TICK]);
 		if($this->handlePacket()){
 			$work = true;
 			while($this->handlePacket());
@@ -44,20 +44,20 @@ class SocketInterface{
 	}
 	
 	public function shutdown(){
-		$this->pushInternalQueue([chr(Info::SIGNAL_SHUTDOWN)]);
+		$this->pushInternalQueue([Info::SIGNAL_SHUTDOWN]);
 	}
 	
 	public function sendPacket(DataPacket $packet){
 		Server::getInstance()->getPluginManager()->callEvent($ev = new CustomPacketSendEvent($packet));
-		if(!$ev->isCancelled()) $this->pushInternalQueue([chr(Info::PACKET_SEND), $packet]);
+		if(!$ev->isCancelled()) $this->pushInternalQueue([Info::PACKET_SEND, $packet]);
 	}
 	
 	public function blockAddress($address, $seconds){
-		$this->pushInternalQueue([chr(Info::SIGNAL_BLOCK), [$address, time() + $seconds]]);
+		$this->pushInternalQueue([Info::SIGNAL_BLOCK, [$address, time() + $seconds]]);
 	}
 	
 	public function unblockAddress($address){
-		$this->pushInternalQueue([chr(Info::SIGNAL_UNBLOCK), $address]);
+		$this->pushInternalQueue([Info::SIGNAL_UNBLOCK, $address]);
 	}
 	
 	/**
@@ -65,19 +65,23 @@ class SocketInterface{
 	 */
 	 
 	public function pushMainQueue(DataPacket $packet){
-		$this->exteranlThreaded[] = json_encode($buffer);
+		//$this->exteranlThreaded[] = json_encode($buffer);
+		$this->exteranlThreaded[] = serialize($buffer);
 	}
 	
 	public function readMainQueue(){
-		return json_decode($this->externalThreaded->shift());
+		//return json_decode($this->externalThreaded->shift());
+		return unserialize($this->externalThreaded->shift());
 	}
 	
 	public function pushInternalQueue(array $buffer){
-		$this->internalThreaded[] = json_encode($buffer);
+		//$this->internalThreaded[] = json_encode($buffer);
+		$this->internalThreaded[] = serialize($buffer);
 	}
 	
 	public function readInternalQueue(){
-		return json_decode($this->internalThreaded->shift());
+		//return json_decode($this->internalThreaded->shift());
+		return unserialize($this->internalThreaded->shift());
 	}
 	
 }

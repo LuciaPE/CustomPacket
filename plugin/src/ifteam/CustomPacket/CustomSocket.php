@@ -11,7 +11,7 @@ require("template/InvalidPacket.php");
 class CustomSocket extends \Thread{
 	
 	protected $internalQueue, $externalQueue, $logger, $port, $interface, $shutdown, $socket, $lastmeasure, $banlist;
-	
+		
 	public function __construct(\Threaded $internalThread, \Threaded $externalThread, \ThreadedLogger $logger, $port, $interface = "0.0.0.0"){
 		$this->internalQueue = $internalThread; //Used to contain internal signals
 		$this->externalQueue = $externalThread; //Used to contain received packets
@@ -38,9 +38,17 @@ class CustomSocket extends \Thread{
 		while(!$this->shutdown and $timeout >= 0){
 			$address = $port = $buffer = null;
 			if(@socket_recvfrom($this->socket, $buffer, 65535, 0, $address, $port) > 0){
+				echo "Received! IP $address PORT $port\n";
+				var_dump($buffer);
+				echo "normal:" . Info::PKHEAD_DATA . "\n";
+				echo "now:" . ord($buffer{0}) . "\n";
 				isset($this->banlist[(string) $address]) ? $this->loginfo((int) $this->banlist[$address].' ' .time()):false;
 				if(!isset($this->banlist[$address]) or (int) $this->banlist[$address] < time()){
-					switch($buffer{0}){
+					$pid = $buffer{0};
+					echo "re past:". $buffer. "\n";
+					$buffer = substr($buffer, 1, strlen($buffer));
+					echo "re now:" . $buffer . "\n";
+					switch(ord($pid)){
 						case Info::PKHEAD_DATA:
 							$this->pushMainQueue(new DataPacket($address, $port, $buffer));
 							break;
@@ -51,7 +59,7 @@ class CustomSocket extends \Thread{
 							$this->pushMainQueue(new EnumPacket($address, $port, $buffer));
 							break;
 						default:
-							$this->pushMainQueue($pk - new InvalidPacket($address, $port, $buffer));
+							$this->pushMainQueue($pk = new InvalidPacket($address, $port, $buffer));
 							$this->logInfo("Custompacket received packet with invalid header! Printing dump...");
 							$pk->printDump();
 					}
@@ -78,7 +86,7 @@ class CustomSocket extends \Thread{
 		}
 		while($this->shutdown === false){
 			if(is_array($buffer = $this->readInternalQueue())){
-				switch(ord($buffer[0]{0})){
+				switch($buffer[0]){
 					case Info::SIGNAL_UPDATE:
 						break;
 						
@@ -99,6 +107,7 @@ class CustomSocket extends \Thread{
 						break;
 						
 					case Info::PACKET_SEND:
+						echo "Sent! IP" . $buffer[1]->address . " PORT" . $buffer[1]->port . "\n";
 						socket_sendto($this->socket, $buffer[1]->data, 1024*1024, 0, $buffer[1]->address, $buffer[1]->port);
 						break;
 						
@@ -124,23 +133,27 @@ class CustomSocket extends \Thread{
 	}
 	
 	public function shutdown(){
-		$this->pushInternalQueue([chr(Info::SIGNAL_SHUTDOWN)]);
+		$this->pushInternalQueue([Info::SIGNAL_SHUTDOWN]);
 	}
 	
 	public function pushMainQueue(DataPacket $packet){
-		$this->externalQueue[] = json_encode($packet);
+		//$this->externalQueue[] = json_encode($packet);
+		$this->externalQueue[] = serialize($packet);
 	}
 	
 	public function readMainQueue(){
-		return json_decode($this->externalQueue->shift());
+		//return json_decode($this->externalQueue->shift());
+		return unserialize($this->externalQueue->shift());
 	}
 	
 	public function pushInternalQueue(array $buffer){
-		$this->internalQueue[] = json_encode($buffer);
+		//$this->internalQueue[] = json_encode($buffer);
+		$this->internalQueue[] = serialize($buffer);
 	}
 	
 	public function readInternalQueue(){
-		return json_decode($this->internalQueue->shift());
+		//return json_decode($this->internalQueue->shift());
+		return unserialize($this->internalQueue->shift());
 	}
 	
 }

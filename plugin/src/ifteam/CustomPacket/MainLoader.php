@@ -15,7 +15,8 @@ class MainLoader extends PluginBase implements Listener {
 		@mkdir($this->getDataFolder());
 		$this->saveDefaultConfig();
 
-		self::$interface = new SocketInterface($this->getServer(), $this->getConfig()->get("port", 19131));
+		if(self::$interface == null)
+			self::$interface = new SocketInterface($this->getServer(), $this->getConfig()->get("port", 19131));
 
 		$this->getServer()->getScheduler()->scheduleRepeatingTask(new CustomPacketTask($this), 1);
 		$this->getLogger()->info("Registered CustomSocket tick schedule.");

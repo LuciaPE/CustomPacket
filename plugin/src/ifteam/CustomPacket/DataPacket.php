@@ -12,7 +12,7 @@ class DataPacket{ //Note: need to be abstract in future
 	public function __construct($address, $port, $data){
 		$this->address = $address;
 		$this->port = $port;
-		$this->data = $this->pid().$data;
+		$this->data = chr($this->pid()).$data;
 	}
 	
 	public function pid(){
