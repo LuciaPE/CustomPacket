@@ -1,0 +1,15 @@
+name: PingPong
+main: PingPong\PingPong
+version: 1.0-Alpha
+author: hm
+api:
+- 1.0.0
+- 1.4.0
+- 1.12.0
+- 1.13.0
+- 2.0.0
+
+permissions:
+ pingpong:
+  descript: "pingpong permission"
+  default: OP
