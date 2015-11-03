@@ -49,7 +49,7 @@ class SocketInterface{
 	
 	public function sendPacket(DataPacket $packet){
 		Server::getInstance()->getPluginManager()->callEvent($ev = new CustomPacketSendEvent($packet));
-		if(!$ev->isCancelled()) $this->pushInternalQueue([Info::PACKET_SEND, $packet]);
+		if(!$ev->isCancelled()) $this->pushInternalQueue([Info::PACKET_SEND, $packet->encode()]);
 	}
 	
 	public function blockAddress($address, $seconds){

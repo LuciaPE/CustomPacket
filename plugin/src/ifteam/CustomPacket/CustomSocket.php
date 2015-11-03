@@ -38,16 +38,10 @@ class CustomSocket extends \Thread{
 		while(!$this->shutdown and $timeout >= 0){
 			$address = $port = $buffer = null;
 			if(@socket_recvfrom($this->socket, $buffer, 65535, 0, $address, $port) > 0){
-				echo "Received! IP $address PORT $port\n";
-				var_dump($buffer);
-				echo "normal:" . Info::PKHEAD_DATA . "\n";
-				echo "now:" . ord($buffer{0}) . "\n";
 				isset($this->banlist[(string) $address]) ? $this->loginfo((int) $this->banlist[$address].' ' .time()):false;
 				if(!isset($this->banlist[$address]) or (int) $this->banlist[$address] < time()){
 					$pid = $buffer{0};
-					echo "re past:". $buffer. "\n";
 					$buffer = substr($buffer, 1, strlen($buffer));
-					echo "re now:" . $buffer . "\n";
 					switch(ord($pid)){
 						case Info::PKHEAD_DATA:
 							$this->pushMainQueue(new DataPacket($address, $port, $buffer));
@@ -107,7 +101,6 @@ class CustomSocket extends \Thread{
 						break;
 						
 					case Info::PACKET_SEND:
-						echo "Sent! IP" . $buffer[1]->address . " PORT" . $buffer[1]->port . "\n";
 						socket_sendto($this->socket, $buffer[1]->data, 1024*1024, 0, $buffer[1]->address, $buffer[1]->port);
 						break;
 						

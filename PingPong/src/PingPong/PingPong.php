@@ -33,27 +33,15 @@ class PingPong extends PluginBase implements Listener {
 				"pingpong" , $args [1] 
 		] );
 		$packet = new DataPacket ( $address [0], $address [1], $data );
-		echo "normal json\n";
-		var_dump($data);
 		CPAPI::sendPacket ( $packet );
 		$this->getLogger ()->info ( "Packet Sent!" );
 		return true;
 	}
 	public function onCustomPacketReceiveEvent(CustomPacketReceiveEvent $event) {
-		echo "Received!\n";
 		$data = json_decode ( $event->getPacket ()->data);
-		var_dump($data);
-		if (! is_array ( $data )){
-			echo "array is not!\n";
+		if (! is_array ( $data ) or $data [0] != "pingpong")
 			return;
-		}
-		if($data [0] != "pingpong"){
-			echo "passpacket wrong!\n";
-			return;
-		}
-		//if (! is_array ( $data ) or $data [0] != "pingpong")
-		//	return;
-		$this->getLogger ()->info ( "Received: " . $data );
+		$this->getLogger ()->info ( "Received: " . $data[1] );
 		$event->getPacket ()->printDump ();
 	}
 	/**
