@@ -3,7 +3,6 @@
 namespace ifteam\CustomPacket\event;
 
 use pocketmine\event\Event;
-use pocketmine\Player;
 use ifteam\CustomPacket\DataPacket;
 
 class CustomPacketEvent extends Event{

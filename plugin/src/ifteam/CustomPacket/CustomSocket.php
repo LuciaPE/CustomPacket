@@ -2,13 +2,14 @@
 
 namespace ifteam\CustomPacket;
 
+use pocketmine\Thread;
 require("Info.php");
 require("DataPacket.php");
 require("template/Base64Packet.php");
 require("template/EnumPacket.php");
 require("template/InvalidPacket.php");
 
-class CustomSocket extends \Thread{
+class CustomSocket extends Thread{
 	
 	protected $internalQueue, $externalQueue, $logger, $port, $interface, $shutdown, $socket, $lastmeasure, $banlist;
 		
@@ -111,6 +112,9 @@ class CustomSocket extends \Thread{
 		}
 		$this->logEmergency("CustomSocket stopped!");
 		@socket_close($this->socket);
+		
+		unset($this->socket);
+		exit(0);
 	}
 	
 	public function blockAddress($address, $time){

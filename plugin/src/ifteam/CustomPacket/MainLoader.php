@@ -25,6 +25,7 @@ class MainLoader extends PluginBase implements Listener {
 	public function onDisable(){
 		if($tasks = CPAPI::getHaltTasks() !== null)
 			foreach($tasks as $task) $task[0]($task[1]);
+		self::$interface->shutdown();
 	}
 
 	public function onCommand(CommandSender $sender,Command $command, $label, Array $args){
